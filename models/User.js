@@ -28,9 +28,10 @@ const UserSchema = new Schema({
     ]
 });
 
-// check this syntax. 'friend' or 'friends'? 
+// check this syntax. 'friend' or 'friends'
 UserSchema.virtual('friendCount').get(function() {
-    return this.friends.reduce((total, friend) => total + friend.length + 1, 0);
+    // return this.friends.reduce((total, friend) => total + friend.length + 1, 0);
+    return this.friends.length;
 });
 
 const User = model('User', UserSchema);
