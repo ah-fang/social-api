@@ -53,7 +53,6 @@ const ThoughtController = {
 
   updateThought({ params, body }, res) {
     Thought.findOneAndUpdate({ _id: params.thoughtId }, body, { new:true, runValidators: true })
-    // is it necessary to update the User this Thought belongs to?
     .then(dbUserData => {
       if (!dbUserData) {
         res.status(404).json({ message: 'No User found with this id!' });
