@@ -108,7 +108,7 @@ const ThoughtController = {
         if(!deletedReaction) {
           return res.status(404).json({ message: 'No reaction found!' })
         }
-        res.json("Successfully deleted");
+        res.json(deletedReaction);
       })
       .catch(err => res.json(err));
   }

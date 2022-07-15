@@ -8,10 +8,6 @@ const UserController = {
             path: 'thoughts',
             select: '-__v'
         })
-        .populate({
-            path: 'friends',
-            select: '-__v', 
-        })
         .select('-__v')
         .then(dbUserData => res.json(dbUserData))
         .catch(err => res.status(400).json(err));
@@ -43,6 +39,8 @@ const UserController = {
     },
     
     updateUser({ params, body }, res) {
+        // update Thoughts first? 
+        
         User.findOneAndUpdate({ _id: params.id }, body, { new:true, runValidators: true })
         // update all thoughts with the new username 
         // .then(({ _id }) => {
@@ -90,7 +88,7 @@ const UserController = {
             { _id: params.userId },
             { $push: { friends: { _id: body.friendId } } },
             { new: true, runValidators: true }
-          )
+        )
             .then(dbUserData => {
               if (!dbUserData) {
                 res.status(404).json({ message: 'No user found with this id!' });
@@ -110,7 +108,7 @@ const UserController = {
               if(!dbUpdatedUser) {
                 return res.status(404).json({ message: 'Not found in friends list!' })
               }
-              res.json("Successfully removed from friends list");
+              res.json(dbUpdatedUser);
             })
             .catch(err => res.json(err));
     }
