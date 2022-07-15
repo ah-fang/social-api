@@ -1,8 +1,9 @@
 const Thought = require('../models/Thought');
 const User = require('../models/User');
 
+//CRUD operations for Thought document
 const ThoughtController = {
-  getAllThoughts(req,res) {
+  getAllThoughts(req, res) {
     Thought.find({})
       .populate({
         path: 'reactions',
@@ -63,22 +64,6 @@ const ThoughtController = {
     .catch(err => res.status(400).json(err));
   },
 
-  addReaction({ params, body }, res) {
-    Thought.findOneAndUpdate(
-      { _id: params.thoughtId },
-      { $push: { reactions: body } },
-      { new: true }
-    )
-      .then(dbThoughtData => {
-        if (!dbThoughtData) {
-          res.status(404).json({ message: 'No thought found with this id!' });
-          return;
-        }
-        res.json(dbThoughtData);
-      })
-      .catch(err => res.json(err));
-  },
-
   removeThought({ params }, res) {
     Thought.findOneAndDelete({ _id: params.thoughtId })
     .then(({ _id }) => {
@@ -97,6 +82,24 @@ const ThoughtController = {
     .catch(err => res.json(err));
   },
 
+  // push a Reaction to the Thought's 'reactions' array
+  addReaction({ params, body }, res) {
+    Thought.findOneAndUpdate(
+      { _id: params.thoughtId },
+      { $push: { reactions: body } },
+      { new: true }
+    )
+      .then(dbThoughtData => {
+        if (!dbThoughtData) {
+          res.status(404).json({ message: 'No thought found with this id!' });
+          return;
+        }
+        res.json(dbThoughtData);
+      })
+      .catch(err => res.json(err));
+  },
+
+  // pull a Reaction from the Thought's 'reactions' array 
   removeReaction({ params }, res) {
     Thought.findOneAndUpdate(
       { _id: params.thoughtId },
