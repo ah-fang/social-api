@@ -8,6 +8,10 @@ const UserController = {
             path: 'thoughts',
             select: '-__v'
         })
+        .populate({
+            path: 'friends',
+            select: '-__v', 
+        })
         .select('-__v')
         .then(dbUserData => res.json(dbUserData))
         .catch(err => res.status(400).json(err));
@@ -63,6 +67,8 @@ const UserController = {
     },
 
     deleteUser({ params }, res) {
+        // delete thoughts first, .then User?
+        // deleting subdocuments: use $pull
         User.findOneAndDelete({ _id: params.id })
         // delete all associated data
         .then(({ username }) => {
@@ -77,7 +83,36 @@ const UserController = {
             res.json({ message: 'Successfully deleted' });
         })
         .catch(err => res.status(400).json(err));
-        // deleting subdocuments: use $pull
+    },
+    
+    addFriend({ params, body }, res) {
+        User.findOneAndUpdate(
+            { _id: params.userId },
+            { $push: { friends: { _id: body.friendId } } },
+            { new: true, runValidators: true }
+          )
+            .then(dbUserData => {
+              if (!dbUserData) {
+                res.status(404).json({ message: 'No user found with this id!' });
+                return;
+              }
+              res.json(dbUserData);
+            })
+            .catch(err => res.json(err));
+    },
+    removeFriend({ params }, res) {
+        User.findOneAndUpdate(
+            { _id: params.userId },
+            { $pull: { friends: { friendId: params.friendId } } },
+            { new: true }
+          )
+            .then(dbUpdatedUser => {
+              if(!dbUpdatedUser) {
+                return res.status(404).json({ message: 'Not found in friends list!' })
+              }
+              res.json("Successfully removed from friends list");
+            })
+            .catch(err => res.json(err));
     }
 }
 
